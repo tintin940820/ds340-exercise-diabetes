@@ -1,16 +1,12 @@
-"""Step 7. Build the generation dataset: young adults (age 18-29) from BRFSS 2015, 2021 and 2023.
-
-Each raw file is read in chunks and only young adults and the needed columns are kept.
-Variable names differ slightly by year, so each year has its own name map to one shared set of
-names. Habits that are not asked in a year are left empty for that year (never filled in).
-"""
+# keep ages 18-29 from BRFSS 2015, 2021 and 2023
+# column names change a bit by year, so map them to one set of names
 import sys
 import numpy as np
 import pandas as pd
 
 FILES = {2015: sys.argv[1], 2021: sys.argv[2], 2023: sys.argv[3]}
 
-# shared name -> raw name in each year (None = not asked that year)
+# None = not asked that year
 MAP = {
     "diab_raw":   {2015: "DIABETE3", 2021: "DIABETE4", 2023: "DIABETE4"},
     "exercise":   {2015: "_TOTINDA", 2021: "_TOTINDA", 2023: "_TOTINDA"},
@@ -37,7 +33,7 @@ for year, path in FILES.items():
     keep = [v[year] for v in MAP.values() if v[year]]
     got = []
     for ch in pd.read_sas(path, format="xport", encoding="latin-1", chunksize=25000):
-        ch = ch[ch[MAP["age5"][year]].between(1, 2)]          # 1 = 18-24, 2 = 25-29
+        ch = ch[ch[MAP["age5"][year]].between(1, 2)]  # 1 = 18-24, 2 = 25-29
         got.append(ch[keep])
     d = pd.concat(got, ignore_index=True)
     out = pd.DataFrame({"year": year}, index=d.index)

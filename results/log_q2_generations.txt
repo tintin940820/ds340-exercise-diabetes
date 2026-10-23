@@ -1,28 +1,28 @@
-STEP 1  young adults: {2015: 35367, 2023: 40371}
-STEP 3  training 53016, validation 7574, test 15148
+{2015: 35367, 2023: 40371}
+train 53016 valid 7574 test 15148
 
-STEP 4  percent of young adults, training set:
-                Millennial_2015  GenZ_2023  change
-Obese                      19.7       23.4     3.8
-No_exercise                17.5       16.4    -1.1
-Smoker                     17.4        6.8   -10.6
-Binge_drinking             26.9       23.9    -3.1
-diabetes                    1.5        2.8     1.2
+% of young adults (train):
+                2015  2023  change
+Obese           19.7  23.4     3.8
+No_exercise     17.5  16.4    -1.1
+Smoker          17.4   6.8   -10.6
+Binge_drinking  26.9  23.9    -3.1
+diabetes         1.5   2.8     1.2
 
-STEP 5  Gen Z odds of diabetes compared with Millennials, training set (1 = no difference):
-                             GenZ_odds_ratio  low_95  high_95
-model                                                        
-same age and sex                        1.83    1.62     2.07
-+ same obesity                          1.71    1.51     1.93
-+ same exercise                         1.72    1.52     1.95
-+ same smoking and drinking             1.85    1.63     2.10
+Gen Z odds ratio (train):
+                     genz_odds_ratio  low_95  high_95
+model                                                
+age, sex                        1.83    1.62     2.07
++ obesity                       1.71    1.51     1.93
++ exercise                      1.72    1.52     1.95
++ smoking, drinking             1.85    1.63     2.10
 
-        validation check (lower log loss = better fit to new people):
-                      model      split  log_loss    AUC
-           same age and sex validation    0.0923 0.5523
-             + same obesity validation    0.0894 0.6450
-            + same exercise validation    0.0895 0.6472
-+ same smoking and drinking validation    0.0896 0.6449
-        best-fitting model: + same obesity
+validation:
+              model   set  log_loss    auc
+           age, sex valid    0.0923 0.5523
+          + obesity valid    0.0894 0.6450
+         + exercise valid    0.0895 0.6472
++ smoking, drinking valid    0.0896 0.6449
+picked: + obesity
 
-STEP 6  test set: AUC = 0.692, log loss = 0.0969
+test auc 0.692, log loss 0.0969

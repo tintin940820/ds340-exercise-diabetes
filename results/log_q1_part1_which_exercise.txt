@@ -1,7 +1,7 @@
-STEP 2  238404 people, 23 sports (plus 'No exercise')
-STEP 3  training 166882, validation 23840, test 47682
+238404 people, 23 sports
+train 166882 valid 23840 test 47682
 
-STEP 4  percent with diabetes or prediabetes, training set, before any adjustment:
+% with diabetes (train):
 sport
 Running              2.7
 Basketball           3.5
@@ -28,36 +28,36 @@ Household chores    18.6
 Stair climbing      19.8
 No exercise         20.9
 
-STEP 5  validation check (lower log loss = better fit to new people):
-                                              model      split  log_loss    AUC
-                                   basic (age, sex) validation    0.3629 0.7400
-full (+ income, education, smoking, drinking, diet) validation    0.3541 0.7627
-        chosen model: full (+ income, education, smoking, drinking, diet)
+validation:
+model   set  log_loss    auc
+basic valid    0.3629 0.7400
+ full valid    0.3541 0.7627
+picked: full
 
-STEP 6  test set: AUC = 0.743, log loss = 0.3631
+test auc 0.743, log loss 0.3631
 
-        odds ratio vs no exercise (1 = same as no exercise, lower = more protective):
-                  odds_ratio  low_95  high_95  people_train
-Tennis                  0.29    0.20     0.44           563
-Golf (walking)          0.31    0.23     0.42           839
-Running                 0.33    0.30     0.38          8238
-Weight lifting          0.34    0.30     0.38          4762
-Basketball              0.34    0.24     0.48           625
-Yoga                    0.45    0.36     0.57          1340
-Bicycling               0.54    0.48     0.60          3537
-Gardening               0.54    0.50     0.58          7663
-Elliptical              0.54    0.46     0.63          2534
-Jogging                 0.55    0.45     0.67          1165
-Swimming laps           0.56    0.43     0.74           750
-Hiking                  0.58    0.47     0.73          1227
-Mowing lawn             0.59    0.46     0.75           561
-Aerobics                0.59    0.51     0.68          3347
-Calisthenics            0.61    0.53     0.70          2175
-Golf (cart)             0.63    0.55     0.73          1869
-Dancing                 0.66    0.54     0.81           846
-Swimming                0.74    0.62     0.88          1279
-Yard work               0.77    0.67     0.87          2253
-Household chores        0.78    0.63     0.97           791
-Walking                 0.82    0.80     0.85         73734
-Stair climbing          0.91    0.70     1.18           426
-Exercise bike           0.97    0.87     1.08          3244
+odds ratio vs no exercise:
+                  odds_ratio  low_95  high_95  n_train
+Tennis                  0.29    0.20     0.44      563
+Golf (walking)          0.31    0.23     0.42      839
+Running                 0.33    0.30     0.38     8238
+Weight lifting          0.34    0.30     0.38     4762
+Basketball              0.34    0.24     0.48      625
+Yoga                    0.45    0.36     0.57     1340
+Bicycling               0.54    0.48     0.60     3537
+Gardening               0.54    0.50     0.58     7663
+Elliptical              0.54    0.46     0.63     2534
+Jogging                 0.55    0.45     0.67     1165
+Swimming laps           0.56    0.43     0.74      750
+Hiking                  0.58    0.47     0.73     1227
+Mowing lawn             0.59    0.46     0.75      561
+Aerobics                0.59    0.51     0.68     3347
+Calisthenics            0.61    0.53     0.70     2175
+Golf (cart)             0.63    0.55     0.73     1869
+Dancing                 0.66    0.54     0.81      846
+Swimming                0.74    0.62     0.88     1279
+Yard work               0.77    0.67     0.87     2253
+Household chores        0.78    0.63     0.97      791
+Walking                 0.82    0.80     0.85    73734
+Stair climbing          0.91    0.70     1.18      426
+Exercise bike           0.97    0.87     1.08     3244

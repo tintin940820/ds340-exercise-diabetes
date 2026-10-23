@@ -1,23 +1,23 @@
-STEP 3  training 177576, validation 25368, test 50736
+train 177576 valid 25368 test 50736
 
-STEP 4  percent with diabetes or prediabetes, training set, before any adjustment:
-        Obese              has it:  23.6%   does not:   9.5%
-        Overweight         has it:  12.5%   does not:  14.8%
-        No_exercise        has it:  20.9%   does not:  11.7%
-        Smoker             has it:  16.7%   does not:  11.8%
-        Heavy_drinking     has it:   7.1%   does not:  14.4%
-        Little_fruit       has it:  15.6%   does not:  12.9%
-        Little_vegetables  has it:  17.6%   does not:  13.0%
+% with diabetes (train):
+Obese              yes  23.6   no   9.5
+Overweight         yes  12.5   no  14.8
+No_exercise        yes  20.9   no  11.7
+Smoker             yes  16.7   no  11.8
+Heavy_drinking     yes   7.1   no  14.4
+Little_fruit       yes  15.6   no  12.9
+Little_vegetables  yes  17.6   no  13.0
 
-STEP 5  validation check (lower log loss = better fit to new people):
-                                model      split  log_loss    AUC
-                         factors only validation    0.3981 0.6789
-factors + age, sex, income, education validation    0.3581 0.7781
-        chosen model: factors + age, sex, income, education
+validation:
+                 model   set  log_loss    auc
+          factors only valid    0.3981 0.6789
+factors + demographics valid    0.3581 0.7781
+picked: factors + demographics
 
-STEP 6  test set: AUC = 0.782, log loss = 0.3429
+test auc 0.782, log loss 0.3429
 
-        odds ratio for each factor, all in one model (above 1 = more diabetes, bigger = stronger):
+odds ratios:
                    odds_ratio  low_95  high_95
 Obese                    4.42    4.24     4.61
 Overweight               2.02    1.93     2.11
