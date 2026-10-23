@@ -40,12 +40,21 @@ results/                          output tables (.csv) and printouts
 figures/                          one chart per question
 ```
 
-Every analysis script follows the same five steps: load the data with survey weights, make 0/1 columns, take a simple look at percentages, fit a weighted logistic regression, and save the table and chart.
+Every analysis script follows the same six steps:
+
+1. Load the data with survey weights.
+2. Make 0/1 columns.
+3. Split the data into **70% training, 10% validation and 20% test**. The split is stratified on the outcome and uses seed 42.
+4. Take a simple look at percentages on the training set.
+5. Fit weighted logistic regression models on the training set, and let the validation set pick the best one.
+6. Check the chosen model once on the test set (AUC and log loss), then save the tables and chart.
+
+Odds ratios come from the training set. The validation and test scores are in `results/*_model_check.csv`.
 
 ## How to run
 
 ```bash
-pip install pandas numpy statsmodels matplotlib pyreadstat
+pip install pandas numpy statsmodels scikit-learn matplotlib pyreadstat
 bash run_all.sh
 ```
 

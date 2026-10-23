@@ -1,0 +1,4 @@
+model,split,log_loss,AUC
+"basic (age, sex)",validation,0.36289894924288113,0.7399984433001571
+"full (+ income, education, smoking, drinking, diet)",validation,0.35406333863548495,0.762677190865417
+"full (+ income, education, smoking, drinking, diet)",test,0.36314790748187736,0.7430439188283947

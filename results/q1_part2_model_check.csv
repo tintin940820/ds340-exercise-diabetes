@@ -1,0 +1,4 @@
+model,split,log_loss,AUC
+factors only,validation,0.3980869552045179,0.6788506866925772
+"factors + age, sex, income, education",validation,0.35810622338637443,0.7781429938496972
+"factors + age, sex, income, education",test,0.342876361270229,0.7822324794036635
