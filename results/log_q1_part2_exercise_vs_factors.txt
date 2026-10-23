@@ -1,0 +1,18 @@
+STEP 3  percent with diabetes or prediabetes, before any adjustment:
+        Obese              has it:  23.7%   does not:   9.6%
+        Overweight         has it:  12.5%   does not:  15.0%
+        No_exercise        has it:  21.1%   does not:  11.8%
+        Smoker             has it:  17.1%   does not:  11.8%
+        Heavy_drinking     has it:   7.2%   does not:  14.5%
+        Little_fruit       has it:  15.7%   does not:  13.1%
+        Little_vegetables  has it:  17.7%   does not:  13.2%
+
+STEP 4  odds ratio for each factor, all in one model (above 1 = more diabetes, bigger = stronger):
+                   odds_ratio  low_95  high_95
+Obese                    4.12    3.98     4.27
+Overweight               1.86    1.79     1.93
+No_exercise              1.28    1.24     1.31
+Smoker                   1.14    1.11     1.17
+Little_vegetables        1.09    1.06     1.13
+Little_fruit             1.07    1.04     1.09
+Heavy_drinking           0.56    0.52     0.60

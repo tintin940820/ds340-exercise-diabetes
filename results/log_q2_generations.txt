@@ -1,0 +1,17 @@
+STEP 1  young adults: {2015: 35367, 2023: 40371}
+
+STEP 3  percent of young adults:
+                Millennial_2015  GenZ_2023  change
+Obese                      19.6       23.6     4.0
+No_exercise                17.7       16.3    -1.3
+Smoker                     17.3        6.8   -10.5
+Binge_drinking             27.3       23.5    -3.8
+diabetes                    1.6        2.6     1.1
+
+STEP 4  Gen Z odds of diabetes compared with Millennials (1 = no difference):
+                             GenZ_odds_ratio  low_95  high_95
+model                                                        
+same age and sex                        1.71    1.55     1.90
++ same obesity                          1.59    1.43     1.76
++ same exercise                         1.60    1.44     1.77
++ same smoking and drinking             1.73    1.55     1.92

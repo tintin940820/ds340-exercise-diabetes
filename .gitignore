@@ -1,0 +1,7 @@
+_old/
+presentation/
+__pycache__/
+.DS_Store
+data/*
+!data/analysis_core.csv.gz
+!data/generation_core.csv.gz
