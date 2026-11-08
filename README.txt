@@ -21,11 +21,31 @@ https://www.cdc.gov/brfss/annual_data/annual_2023.html
 
 Files
 prepare/ - makes the two clean tables from the raw files
+tools.py - shared functions (load data, split, fit model, score, odds ratios, charts)
+parent_paper_1.py - reproduces parent paper 1 (Aich et al. 2025) Table 3
 q1_part1_which_exercise.py
 q1_part2_exercise_vs_factors.py
 q2_generations.py
 results/ - output tables
 figures/ - charts
+
+Reproducing parent paper 1
+Aich et al. (2025), A copula based supervised filter for feature selection in machine
+learning driven diabetes risk prediction, arXiv 2505.22554.
+Same CDC data (253,680 adults, 21 features), same 4 models (LR, RF, GB, XGBoost), all 21
+features vs the Gumbel copula top 10, same setup as the paper (80/20 split, 20% of train
+to pick the threshold, class weights, isotonic calibration).
+Results: results/parent_paper_1_reproduction.csv (ours next to the paper's numbers)
+and results/parent_paper_1_gumbel_scores.csv.
+
+Test AUC, ours vs paper (Table 3):
+              All 21 features     Gumbel top 10
+LR            0.818 vs 0.820      0.814 vs 0.816
+RF            0.807 vs 0.801      0.766 vs 0.741
+GB            0.825 vs 0.827      0.821 vs 0.823
+XGBoost       0.821 vs 0.827      0.817 vs 0.822
+The Gumbel top 10 features match the paper exactly, in the same order.
+The paper does not give tree settings or its random seed, so we used library defaults.
 
 Method
 Weighted logistic regression with the CDC survey weights.
@@ -34,8 +54,9 @@ Models are fit on train, validation picks the model, test is used once for AUC.
 Odds ratios come from the training set.
 
 Run
-pip install pandas numpy statsmodels scikit-learn matplotlib pyreadstat
+pip install pandas numpy scipy statsmodels scikit-learn xgboost matplotlib pyreadstat
 bash run_all.sh
+python3 parent_paper_1.py   (takes about 10 minutes)
 
 To rebuild the clean tables (inside prepare/):
 python3 01_load_raw.py LLCP2015.XPT

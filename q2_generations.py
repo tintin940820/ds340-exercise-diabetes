@@ -3,18 +3,10 @@
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import log_loss, roc_auc_score
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import tools
 
-d = pd.read_csv("data/generation_core.csv.gz")
-d = d[d.year.isin([2015, 2023])]
-d = d.dropna(subset=["diabetes", "weight_status", "inactive", "current_smoker", "binge"])
-d["w"] = d.weight / d.weight.mean()
+d = tools.load_young()
 print(d.groupby("year").size().to_dict())
 
 d["GenZ"] = (d.year == 2023).astype(int)
@@ -24,14 +16,13 @@ d["Smoker"] = d.current_smoker
 d["Binge_drinking"] = d.binge
 habits = ["Obese", "No_exercise", "Smoker", "Binge_drinking"]
 
-# 70% train, 10% validation, 20% test, stratified on year and diabetes
+# stratify on year and diabetes together
 grp = d.year.astype(str) + "_" + d.diabetes.astype(int).astype(str)
-train, rest = train_test_split(d, test_size=0.30, stratify=grp, random_state=42)
-valid, test = train_test_split(rest, test_size=2 / 3, stratify=grp[rest.index], random_state=42)
+train, valid, test = tools.split(d, grp)
 print("train", len(train), "valid", len(valid), "test", len(test))
 
-pct = pd.DataFrame({c: {"2015": 100 * np.average(train[c][train.GenZ == 0], weights=train.w[train.GenZ == 0]),
-                        "2023": 100 * np.average(train[c][train.GenZ == 1], weights=train.w[train.GenZ == 1])}
+old, new = train[train.GenZ == 0], train[train.GenZ == 1]
+pct = pd.DataFrame({c: {"2015": tools.wpct(old[c], old.w), "2023": tools.wpct(new[c], new.w)}
                     for c in habits + ["diabetes"]}).T
 pct["change"] = pct["2023"] - pct["2015"]
 print("\n% of young adults (train):")
@@ -41,28 +32,21 @@ steps = {"age, sex": [],
          "+ obesity": ["Obese"],
          "+ exercise": ["Obese", "No_exercise"],
          "+ smoking, drinking": ["Obese", "No_exercise", "Smoker", "Binge_drinking"]}
-fits, rows, scores = {}, [], []
-for name, extra in steps.items():
-    m = smf.glm("diabetes ~ GenZ + male + age_25_29" + "".join(" + " + h for h in extra),
-                data=train, family=sm.families.Binomial(), var_weights=train.w).fit()
-    fits[name] = m
-    ci = np.exp(m.conf_int().loc["GenZ"])
-    rows.append({"model": name, "genz_odds_ratio": np.exp(m.params["GenZ"]), "low_95": ci[0], "high_95": ci[1]})
-    p = m.predict(valid)
-    scores.append({"model": name, "set": "valid", "log_loss": log_loss(valid.diabetes, p, sample_weight=valid.w),
-                   "auc": roc_auc_score(valid.diabetes, p, sample_weight=valid.w)})
-out = pd.DataFrame(rows).set_index("model")
+models = {name: "diabetes ~ GenZ + male + age_25_29" + "".join(" + " + h for h in extra)
+          for name, extra in steps.items()}
+fits, scores, best = tools.fit_and_pick(models, train, valid, "diabetes")
+
+out = pd.concat([tools.odds_ratios(m, ["GenZ"]).rename(index={"GenZ": name}) for name, m in fits.items()])
+out.index.name = "model"
+out.columns = ["genz_odds_ratio", "low_95", "high_95"]
 print("\nGen Z odds ratio (train):")
 print(out.round(2).to_string())
 
-best = min(scores, key=lambda s: s["log_loss"])["model"]
 print("\nvalidation:")
 print(pd.DataFrame(scores).round(4).to_string(index=False))
 print("picked:", best)
 
-p = fits[best].predict(test)
-scores.append({"model": best, "set": "test", "log_loss": log_loss(test.diabetes, p, sample_weight=test.w),
-               "auc": roc_auc_score(test.diabetes, p, sample_weight=test.w)})
+scores.append(tools.score(fits[best], test, "diabetes", best, "test"))
 print(f"\ntest auc {scores[-1]['auc']:.3f}, log loss {scores[-1]['log_loss']:.4f}")
 
 pct.to_csv("results/q2_habits_and_diabetes.csv")
