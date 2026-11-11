@@ -6,8 +6,17 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+from scipy.stats import kendalltau
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import log_loss, roc_auc_score
+from sklearn.metrics import (log_loss, roc_auc_score, accuracy_score, f1_score,
+                             precision_recall_fscore_support)
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.feature_selection import mutual_info_classif
+from xgboost import XGBClassifier
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -75,6 +84,90 @@ def fit_and_pick(formulas, train, valid, y):
 def odds_ratios(model, rows):
     ci = np.exp(model.conf_int().loc[rows])
     return pd.DataFrame({"odds_ratio": np.exp(model.params[rows]), "low_95": ci[0], "high_95": ci[1]})
+
+
+# ---- parent paper 1 models (classifiers, threshold, scoring)
+
+def gumbel_scores(X, y):
+    # paper 1: tau > 0 -> lambda_U = 2 - 2^(1/theta), theta = 1/(1-tau); tau <= 0 -> 0
+    rows = []
+    for c in X.columns:
+        tau = kendalltau(X[c], y).statistic
+        lam = 2 - 2 ** (1 - tau) if tau > 0 else 0.0
+        rows.append({"feature": c, "tau": tau, "lambda_U": lam})
+    return pd.DataFrame(rows).sort_values("lambda_U", ascending=False).reset_index(drop=True)
+
+
+def make_model(name, y):
+    pos_weight = (y == 0).sum() / (y == 1).sum()
+    if name == "LR":
+        return make_pipeline(StandardScaler(), LogisticRegression(class_weight="balanced", max_iter=1000))
+    if name == "RF":
+        base = RandomForestClassifier(class_weight="balanced", n_jobs=-1, random_state=SEED)
+    elif name == "GB":
+        base = GradientBoostingClassifier(random_state=SEED)
+    else:
+        base = XGBClassifier(scale_pos_weight=pos_weight, n_jobs=-1, random_state=SEED)
+    return CalibratedClassifierCV(base, method="isotonic", cv=5)
+
+
+def fit(name, model, X, y):
+    if name == "GB":
+        # per-sample weights = inverse class frequency
+        w = np.where(y == 1, len(y) / (2 * (y == 1).sum()), len(y) / (2 * (y == 0).sum()))
+        return model.fit(X, y, sample_weight=w)
+    return model.fit(X, y)
+
+
+def best_threshold(p, y):
+    # scan a fine grid of probability quantiles, keep the one with the best F1
+    grid = np.unique(np.quantile(p, np.linspace(0.01, 0.99, 197)))
+    return max(grid, key=lambda t: f1_score(y, p >= t))
+
+
+def evaluate(p, y, t, boot=200):
+    pred = (p >= t).astype(int)
+    prec, rec, f1, _ = precision_recall_fscore_support(y, pred, average="weighted", zero_division=0)
+    rng = np.random.default_rng(SEED)
+    aucs = [roc_auc_score(y[i], p[i]) for i in (rng.integers(0, len(y), len(y)) for _ in range(boot))]
+    return {"acc": accuracy_score(y, pred), "prec": prec, "rec": rec, "f1": f1,
+            "auc": roc_auc_score(y, p), "auc_low": np.percentile(aucs, 2.5), "auc_high": np.percentile(aucs, 97.5)}
+
+
+# ---- feature selection block (swap the method, everything else stays the same)
+
+# extra exercise detail we recovered from the raw 2015 file (not in the public CDC table)
+EXERCISE = ["PA_minutes", "MainSport_MET", "Strength_per_week", "PA_level"]
+
+
+def two_sided_gumbel_scores(X, y):
+    # our change: a feature that goes DOWN with diabetes (tau < 0) is flipped (-x),
+    # which is the 180-degree rotated Gumbel copula, so it gets the same score as a
+    # feature that goes up by the same amount: lambda = 2 - 2^(1 - |tau|)
+    rows = []
+    for c in X.columns:
+        tau = kendalltau(X[c], y).statistic
+        rows.append({"feature": c, "tau": tau, "lambda_U": 2 - 2 ** (1 - abs(tau)),
+                     "direction": "protective" if tau < 0 else "risk"})
+    return pd.DataFrame(rows).sort_values("lambda_U", ascending=False).reset_index(drop=True)
+
+
+def select_features(method, X, y, k=10):
+    # returns the top k columns of X picked by one method
+    if method == "gumbel":
+        return list(gumbel_scores(X, y).feature[:k])
+    if method == "two_sided_gumbel":
+        return list(two_sided_gumbel_scores(X, y).feature[:k])
+    if method == "mutual_info":
+        sub = X.sample(min(len(X), 50000), random_state=SEED)
+        mi = mutual_info_classif(sub, y[sub.index], random_state=SEED)
+        return list(pd.Series(mi, X.columns).sort_values(ascending=False).index[:k])
+    if method == "l1_logistic":
+        # smallest penalty that keeps about k features, ranked by size of the coefficient
+        Xs = StandardScaler().fit_transform(X)
+        coef = LogisticRegression(penalty="l1", solver="liblinear", C=0.01).fit(Xs, y).coef_[0]
+        return list(pd.Series(np.abs(coef), X.columns).sort_values(ascending=False).index[:k])
+    raise ValueError(method)
 
 
 # ---- output

@@ -2,17 +2,9 @@
 # same 253,680 adults and 21 features, same 4 models, all features vs Gumbel copula top-10
 # paper setup: 80/20 stratified split, 20% of train held out to pick the threshold
 
-import numpy as np
 import pandas as pd
-from scipy.stats import kendalltau
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, f1_score, roc_auc_score
-from xgboost import XGBClassifier
 import tools
+from tools import gumbel_scores, make_model, fit, best_threshold, evaluate
 
 # numbers reported in the paper (Table 3): acc, prec, rec, f1, auc
 PAPER = {("All", "GB"): (0.804, 0.854, 0.804, 0.822, 0.827),
@@ -25,52 +17,6 @@ PAPER = {("All", "GB"): (0.804, 0.854, 0.804, 0.822, 0.827),
          ("Gumbel", "XGB"): (0.810, 0.851, 0.810, 0.826, 0.822)}
 PAPER_TOP10 = ["GenHlth", "HighBP", "DiffWalk", "HighChol", "BMI", "HeartDiseaseorAttack",
                "Age", "PhysHlth", "Stroke", "CholCheck"]
-
-
-def gumbel_scores(X, y):
-    # paper 1: tau > 0 -> lambda_U = 2 - 2^(1/theta), theta = 1/(1-tau); tau <= 0 -> 0
-    rows = []
-    for c in X.columns:
-        tau = kendalltau(X[c], y).statistic
-        lam = 2 - 2 ** (1 - tau) if tau > 0 else 0.0
-        rows.append({"feature": c, "tau": tau, "lambda_U": lam})
-    return pd.DataFrame(rows).sort_values("lambda_U", ascending=False).reset_index(drop=True)
-
-
-def make_model(name, y):
-    pos_weight = (y == 0).sum() / (y == 1).sum()
-    if name == "LR":
-        return make_pipeline(StandardScaler(), LogisticRegression(class_weight="balanced", max_iter=1000))
-    if name == "RF":
-        base = RandomForestClassifier(class_weight="balanced", n_jobs=-1, random_state=tools.SEED)
-    elif name == "GB":
-        base = GradientBoostingClassifier(random_state=tools.SEED)
-    else:
-        base = XGBClassifier(scale_pos_weight=pos_weight, n_jobs=-1, random_state=tools.SEED)
-    return CalibratedClassifierCV(base, method="isotonic", cv=5)
-
-
-def fit(name, model, X, y):
-    if name == "GB":
-        # per-sample weights = inverse class frequency
-        w = np.where(y == 1, len(y) / (2 * (y == 1).sum()), len(y) / (2 * (y == 0).sum()))
-        return model.fit(X, y, sample_weight=w)
-    return model.fit(X, y)
-
-
-def best_threshold(p, y):
-    # scan a fine grid of probability quantiles, keep the one with the best F1
-    grid = np.unique(np.quantile(p, np.linspace(0.01, 0.99, 197)))
-    return max(grid, key=lambda t: f1_score(y, p >= t))
-
-
-def evaluate(p, y, t, boot=200):
-    pred = (p >= t).astype(int)
-    prec, rec, f1, _ = precision_recall_fscore_support(y, pred, average="weighted", zero_division=0)
-    rng = np.random.default_rng(tools.SEED)
-    aucs = [roc_auc_score(y[i], p[i]) for i in (rng.integers(0, len(y), len(y)) for _ in range(boot))]
-    return {"acc": accuracy_score(y, pred), "prec": prec, "rec": rec, "f1": f1,
-            "auc": roc_auc_score(y, p), "auc_low": np.percentile(aucs, 2.5), "auc_high": np.percentile(aucs, 97.5)}
 
 
 d = tools.load_adults()
