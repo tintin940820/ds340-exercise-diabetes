@@ -4,22 +4,27 @@
 import pandas as pd
 import tools
 
-d = tools.load_adults()
+train, valid = tools.load_train_valid("q1")
 
 # main sport codes from the BRFSS codebook, 0 = no exercise
 names = {2: "Aerobics", 5: "Basketball", 6: "Exercise bike", 7: "Bicycling", 11: "Calisthenics", 14: "Dancing",
          15: "Elliptical", 18: "Gardening", 19: "Golf (cart)", 20: "Golf (walking)", 22: "Hiking", 28: "Jogging",
          31: "Mowing lawn", 37: "Running", 54: "Stair climbing", 57: "Swimming", 58: "Swimming laps",
          61: "Tennis", 64: "Walking", 67: "Weight lifting", 69: "Yoga", 73: "Household chores", 76: "Yard work"}
-d["sport"] = d.MainSport.map(names)
-d.loc[d.MainSport == 0, "sport"] = "No exercise"
-d = d.dropna(subset=["sport"])
-counts = d.sport.value_counts()
-d = d[d.sport.map(counts) >= 500]
-print(len(d), "people,", d.sport.nunique() - 1, "sports")
 
-train, valid, test = tools.split(d, d.Diabetes)
-print("train", len(train), "valid", len(valid), "test", len(test))
+
+def add_sport(d):
+    d["sport"] = d.MainSport.map(names)
+    d.loc[d.MainSport == 0, "sport"] = "No exercise"
+    return d.dropna(subset=["sport"])
+
+
+train, valid = add_sport(train), add_sport(valid)
+# keep sports with at least 350 people in the training set (about 500 in all), decided on train only
+counts = train.sport.value_counts()
+keep = counts.index[counts >= 350]
+train, valid = train[train.sport.isin(keep)], valid[valid.sport.isin(keep)]
+print("kept", len(train), "train and", len(valid), "validation people,", len(keep) - 1, "sports")
 
 pct = train.groupby("sport").apply(lambda g: tools.wpct(g.Diabetes, g.w))
 print("\n% with diabetes (train):")
@@ -34,6 +39,8 @@ print(pd.DataFrame(scores).round(4).to_string(index=False))
 print("picked:", best)
 
 m = fits[best]
+test = add_sport(tools.load_test("q1"))
+test = test[test.sport.isin(keep)]
 scores.append(tools.score(m, test, "Diabetes", best, "test"))
 print(f"\ntest auc {scores[-1]['auc']:.3f}, log loss {scores[-1]['log_loss']:.4f}")
 

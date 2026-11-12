@@ -1,0 +1,14 @@
+
+q1: 253680 rows
+  train       177576 rows  70.0%  diabetes 15.8%
+  validation   25368 rows  10.0%  diabetes 15.8%
+  test         50736 rows  20.0%  diabetes 15.8%
+
+q2: 75738 rows
+  train        53016 rows  70.0%  diabetes  2.0%
+  validation    7574 rows  10.0%  diabetes  2.0%
+  test         15148 rows  20.0%  diabetes  2.0%
+
+checks:
+  q1: no shared rows, every row used once, 70/10/20, same diabetes rate, labels ok
+  q2: no shared rows, every row used once, 70/10/20, same diabetes rate, labels ok

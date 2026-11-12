@@ -30,30 +30,61 @@ STD21 = ["HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", "HeartDis
 
 
 # ---- data
+# the project uses ONE split, made once by make_splits.py and saved in data/splits/:
+#   train 70%       fit the models
+#   validation 10%  pick the model / the threshold / the features
+#   test 20%        unseen: opened once, at the very end, after everything is picked
+# every analysis script reads these files. no script makes its own split.
+
+SPLIT_DIR = "data/splits"
+PARTS = ["train", "validation", "test"]
+
 
 def load_adults():
-    # BRFSS 2015, all adults
+    # BRFSS 2015, all adults (Q1 and parent paper 1). only make_splits.py calls this
     d = pd.read_csv("data/analysis_core.csv.gz")
-    d["w"] = d.weight / d.weight.mean()
+    d.insert(0, "row_id", np.arange(len(d)))
     return d
 
 
 def load_young():
-    # BRFSS 2015 and 2023, ages 18-29, people who answered every habit question
+    # BRFSS 2015 and 2023, ages 18-29, people who answered every habit question (Q2).
+    # only make_splits.py calls this
     d = pd.read_csv("data/generation_core.csv.gz")
+    d.insert(0, "row_id", np.arange(len(d)))
     d = d[d.year.isin([2015, 2023])]
-    d = d.dropna(subset=["diabetes", "weight_status", "inactive", "current_smoker", "binge"])
-    d["w"] = d.weight / d.weight.mean()
-    return d
+    return d.dropna(subset=["diabetes", "weight_status", "inactive", "current_smoker", "binge"])
 
 
 def split(d, strata, test=0.20, valid=0.10, seed=SEED):
-    # stratified train / validation / test split (default 70 / 10 / 20)
+    # stratified train / validation / test split (70 / 10 / 20). only make_splits.py calls this
     held = Fraction(str(test)) + Fraction(str(valid))
     train, rest = train_test_split(d, test_size=float(held), stratify=strata, random_state=seed)
     valid_part, test_part = train_test_split(rest, test_size=float(Fraction(str(test)) / held),
                                              stratify=strata[rest.index], random_state=seed)
     return train, valid_part, test_part
+
+
+def _load(q, part):
+    d = pd.read_csv(f"{SPLIT_DIR}/{q}_{part}.csv.gz")
+    if not (d.dataset == part).all():
+        raise ValueError(f"{q}_{part} file has rows labeled as another set")
+    d["w"] = d.weight / d.weight.mean()  # survey weight, scaled to mean 1
+    return d
+
+
+def load_train_valid(q):
+    # q = "q1" (2015 adults) or "q2" (ages 18-29, 2015 and 2023)
+    train, valid = _load(q, "train"), _load(q, "validation")
+    print(f"{q}: train {len(train)} rows, validation {len(valid)} rows (test set not opened yet)")
+    return train, valid
+
+
+def load_test(q):
+    # the unseen set. call this only after the model is picked on train + validation
+    test = _load(q, "test")
+    print(f"\n--- opening the {q} test set ({len(test)} rows), used once ---")
+    return test
 
 
 def wpct(x, w):

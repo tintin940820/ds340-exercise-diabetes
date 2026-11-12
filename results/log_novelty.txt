@@ -1,76 +1,96 @@
-train 162355 valid 40588 test 50737
+q1: train 177576 rows, validation 25368 rows (test set not opened yet)
 
 two-sided Gumbel scores (21 features + exercise detail):
              feature     tau  lambda_U  direction
-             GenHlth  0.2708    0.3423       risk
-              HighBP  0.2706    0.3421       risk
-            DiffWalk  0.2228    0.2862       risk
-            HighChol  0.2090    0.2697       risk
-                 BMI  0.1930    0.2504       risk
-HeartDiseaseorAttack  0.1771    0.2311       risk
-                 Age  0.1595    0.2094       risk
-              Income -0.1531    0.2014 protective
-            PhysHlth  0.1502    0.1978       risk
-        PhysActivity -0.1210    0.1609 protective
-           Education -0.1159    0.1544 protective
-       MainSport_MET -0.1019    0.1364 protective
-              Stroke  0.1015    0.1358       risk
-   Strength_per_week -0.0998    0.1336 protective
-            PA_level  0.0933    0.1252       risk
-          PA_minutes -0.0834    0.1124 protective
-           CholCheck  0.0692    0.0936       risk
-              Smoker  0.0604    0.0820       risk
-             Veggies -0.0578    0.0786 protective
-   HvyAlcoholConsump -0.0570    0.0774 protective
-              Fruits -0.0422    0.0577 protective
-            MentHlth  0.0411    0.0562       risk
-         NoDocbcCost  0.0357    0.0489       risk
-                 Sex  0.0318    0.0436       risk
-       AnyHealthcare  0.0156    0.0216       risk
+             GenHlth  0.2701    0.3415       risk
+              HighBP  0.2696    0.3409       risk
+            DiffWalk  0.2209    0.2839       risk
+            HighChol  0.2089    0.2696       risk
+                 BMI  0.1931    0.2506       risk
+HeartDiseaseorAttack  0.1775    0.2315       risk
+                 Age  0.1586    0.2083       risk
+              Income -0.1524    0.2005 protective
+            PhysHlth  0.1493    0.1966       risk
+        PhysActivity -0.1208    0.1607 protective
+           Education -0.1157    0.1541 protective
+       MainSport_MET -0.1024    0.1371 protective
+              Stroke  0.1012    0.1355       risk
+   Strength_per_week -0.1001    0.1341 protective
+            PA_level  0.0938    0.1259       risk
+          PA_minutes -0.0839    0.1131 protective
+           CholCheck  0.0685    0.0927       risk
+              Smoker  0.0610    0.0828       risk
+             Veggies -0.0572    0.0778 protective
+   HvyAlcoholConsump -0.0569    0.0773 protective
+              Fruits -0.0424    0.0579 protective
+            MentHlth  0.0412    0.0563       risk
+         NoDocbcCost  0.0366    0.0501       risk
+                 Sex  0.0310    0.0426       risk
+       AnyHealthcare  0.0150    0.0207       risk
 
 features picked:
   All 21 (paper): ['HighBP', 'HighChol', 'CholCheck', 'BMI', 'Smoker', 'Stroke', 'HeartDiseaseorAttack', 'PhysActivity', 'Fruits', 'Veggies', 'HvyAlcoholConsump', 'AnyHealthcare', 'NoDocbcCost', 'GenHlth', 'MentHlth', 'PhysHlth', 'DiffWalk', 'Sex', 'Age', 'Education', 'Income']
   Gumbel top 10 (paper): ['GenHlth', 'HighBP', 'DiffWalk', 'HighChol', 'BMI', 'HeartDiseaseorAttack', 'Age', 'PhysHlth', 'Stroke', 'CholCheck']
   Two-sided Gumbel top 10 (ours): ['GenHlth', 'HighBP', 'DiffWalk', 'HighChol', 'BMI', 'HeartDiseaseorAttack', 'Age', 'Income', 'PhysHlth', 'PhysActivity']
-  Mutual information top 10: ['GenHlth', 'HighBP', 'BMI', 'HighChol', 'DiffWalk', 'Age', 'PhysHlth', 'Income', 'PhysActivity', 'CholCheck']
-  L1 logistic top 10: ['GenHlth', 'BMI', 'Age', 'HighBP', 'HighChol', 'CholCheck', 'HvyAlcoholConsump', 'Income', 'Sex', 'HeartDiseaseorAttack']
+  Mutual information top 10: ['GenHlth', 'HighBP', 'BMI', 'HighChol', 'Age', 'DiffWalk', 'Income', 'PhysHlth', 'HeartDiseaseorAttack', 'CholCheck']
+  L1 logistic top 10: ['GenHlth', 'BMI', 'Age', 'HighBP', 'HighChol', 'CholCheck', 'HvyAlcoholConsump', 'Sex', 'Income', 'HeartDiseaseorAttack']
   Two-sided top 10, yes/no exercise -> exercise detail (ours): ['GenHlth', 'HighBP', 'DiffWalk', 'HighChol', 'BMI', 'HeartDiseaseorAttack', 'Age', 'Income', 'PhysHlth', 'PA_minutes', 'MainSport_MET', 'Strength_per_week', 'PA_level']
-All 21 (paper)                                     LR  auc 0.818 (0.813-0.823) acc 0.772 f1 0.795
-All 21 (paper)                                     GB  auc 0.825 (0.821-0.830) acc 0.798 f1 0.814
-All 21 (paper)                                     XGB auc 0.821 (0.817-0.827) acc 0.792 f1 0.809
-Gumbel top 10 (paper)                              LR  auc 0.814 (0.810-0.819) acc 0.759 f1 0.786
-Gumbel top 10 (paper)                              GB  auc 0.821 (0.817-0.826) acc 0.783 f1 0.803
-Gumbel top 10 (paper)                              XGB auc 0.817 (0.812-0.822) acc 0.784 f1 0.804
-Two-sided Gumbel top 10 (ours)                     LR  auc 0.814 (0.809-0.820) acc 0.778 f1 0.799
-Two-sided Gumbel top 10 (ours)                     GB  auc 0.821 (0.817-0.826) acc 0.794 f1 0.810
-Two-sided Gumbel top 10 (ours)                     XGB auc 0.816 (0.812-0.822) acc 0.792 f1 0.809
-Mutual information top 10                          LR  auc 0.814 (0.810-0.820) acc 0.782 f1 0.802
-Mutual information top 10                          GB  auc 0.821 (0.817-0.826) acc 0.801 f1 0.815
-Mutual information top 10                          XGB auc 0.817 (0.813-0.822) acc 0.785 f1 0.804
-L1 logistic top 10                                 LR  auc 0.817 (0.813-0.822) acc 0.770 f1 0.794
-L1 logistic top 10                                 GB  auc 0.825 (0.820-0.829) acc 0.793 f1 0.810
-L1 logistic top 10                                 XGB auc 0.820 (0.816-0.826) acc 0.797 f1 0.813
-Two-sided top 10, yes/no exercise -> exercise detail (ours) LR  auc 0.814 (0.810-0.820) acc 0.778 f1 0.799
-Two-sided top 10, yes/no exercise -> exercise detail (ours) GB  auc 0.822 (0.817-0.827) acc 0.781 f1 0.802
-Two-sided top 10, yes/no exercise -> exercise detail (ours) XGB auc 0.818 (0.813-0.823) acc 0.791 f1 0.809
+fit All 21 (paper)                                     LR  threshold 0.622
+fit All 21 (paper)                                     GB  threshold 0.663
+fit All 21 (paper)                                     XGB threshold 0.261
+fit Gumbel top 10 (paper)                              LR  threshold 0.604
+fit Gumbel top 10 (paper)                              GB  threshold 0.637
+fit Gumbel top 10 (paper)                              XGB threshold 0.249
+fit Two-sided Gumbel top 10 (ours)                     LR  threshold 0.588
+fit Two-sided Gumbel top 10 (ours)                     GB  threshold 0.660
+fit Two-sided Gumbel top 10 (ours)                     XGB threshold 0.247
+fit Mutual information top 10                          LR  threshold 0.589
+fit Mutual information top 10                          GB  threshold 0.617
+fit Mutual information top 10                          XGB threshold 0.242
+fit L1 logistic top 10                                 LR  threshold 0.611
+fit L1 logistic top 10                                 GB  threshold 0.631
+fit L1 logistic top 10                                 XGB threshold 0.236
+fit Two-sided top 10, yes/no exercise -> exercise detail (ours) LR  threshold 0.598
+fit Two-sided top 10, yes/no exercise -> exercise detail (ours) GB  threshold 0.648
+fit Two-sided top 10, yes/no exercise -> exercise detail (ours) XGB threshold 0.256
+
+--- opening the q1 test set (50736 rows), used once ---
+All 21 (paper)                                     LR  auc 0.817 (0.812-0.821) acc 0.792 f1 0.809
+All 21 (paper)                                     GB  auc 0.825 (0.821-0.829) acc 0.810 f1 0.822
+All 21 (paper)                                     XGB auc 0.822 (0.818-0.827) acc 0.805 f1 0.819
+Gumbel top 10 (paper)                              LR  auc 0.813 (0.808-0.818) acc 0.784 f1 0.803
+Gumbel top 10 (paper)                              GB  auc 0.821 (0.816-0.825) acc 0.795 f1 0.811
+Gumbel top 10 (paper)                              XGB auc 0.817 (0.813-0.822) acc 0.796 f1 0.812
+Two-sided Gumbel top 10 (ours)                     LR  auc 0.813 (0.808-0.817) acc 0.777 f1 0.798
+Two-sided Gumbel top 10 (ours)                     GB  auc 0.821 (0.816-0.825) acc 0.802 f1 0.816
+Two-sided Gumbel top 10 (ours)                     XGB auc 0.817 (0.812-0.821) acc 0.796 f1 0.812
+Mutual information top 10                          LR  auc 0.814 (0.810-0.819) acc 0.777 f1 0.799
+Mutual information top 10                          GB  auc 0.822 (0.817-0.826) acc 0.789 f1 0.808
+Mutual information top 10                          XGB auc 0.818 (0.814-0.823) acc 0.794 f1 0.811
+L1 logistic top 10                                 LR  auc 0.816 (0.812-0.821) acc 0.788 f1 0.806
+L1 logistic top 10                                 GB  auc 0.824 (0.820-0.828) acc 0.796 f1 0.812
+L1 logistic top 10                                 XGB auc 0.821 (0.816-0.825) acc 0.791 f1 0.809
+Two-sided top 10, yes/no exercise -> exercise detail (ours) LR  auc 0.813 (0.808-0.817) acc 0.781 f1 0.801
+Two-sided top 10, yes/no exercise -> exercise detail (ours) GB  auc 0.821 (0.816-0.825) acc 0.799 f1 0.814
+Two-sided top 10, yes/no exercise -> exercise detail (ours) XGB auc 0.817 (0.812-0.821) acc 0.804 f1 0.817
 
 comparison (test set):
                                                    features model  protective_kept   auc  auc_low  auc_high   acc    f1
-                                             All 21 (paper)    LR                6 0.818    0.813     0.823 0.772 0.795
-                                             All 21 (paper)    GB                6 0.825    0.821     0.830 0.798 0.814
-                                             All 21 (paper)   XGB                6 0.821    0.817     0.827 0.792 0.809
-                                      Gumbel top 10 (paper)    LR                0 0.814    0.810     0.819 0.759 0.786
-                                      Gumbel top 10 (paper)    GB                0 0.821    0.817     0.826 0.783 0.803
-                                      Gumbel top 10 (paper)   XGB                0 0.817    0.812     0.822 0.784 0.804
-                             Two-sided Gumbel top 10 (ours)    LR                2 0.814    0.809     0.820 0.778 0.799
-                             Two-sided Gumbel top 10 (ours)    GB                2 0.821    0.817     0.826 0.794 0.810
-                             Two-sided Gumbel top 10 (ours)   XGB                2 0.816    0.812     0.822 0.792 0.809
-                                  Mutual information top 10    LR                2 0.814    0.810     0.820 0.782 0.802
-                                  Mutual information top 10    GB                2 0.821    0.817     0.826 0.801 0.815
-                                  Mutual information top 10   XGB                2 0.817    0.813     0.822 0.785 0.804
-                                         L1 logistic top 10    LR                2 0.817    0.813     0.822 0.770 0.794
-                                         L1 logistic top 10    GB                2 0.825    0.820     0.829 0.793 0.810
-                                         L1 logistic top 10   XGB                2 0.820    0.816     0.826 0.797 0.813
-Two-sided top 10, yes/no exercise -> exercise detail (ours)    LR                4 0.814    0.810     0.820 0.778 0.799
-Two-sided top 10, yes/no exercise -> exercise detail (ours)    GB                4 0.822    0.817     0.827 0.781 0.802
-Two-sided top 10, yes/no exercise -> exercise detail (ours)   XGB                4 0.818    0.813     0.823 0.791 0.809
+                                             All 21 (paper)    LR                6 0.817    0.812     0.821 0.792 0.809
+                                             All 21 (paper)    GB                6 0.825    0.821     0.829 0.810 0.822
+                                             All 21 (paper)   XGB                6 0.822    0.818     0.827 0.805 0.819
+                                      Gumbel top 10 (paper)    LR                0 0.813    0.808     0.818 0.784 0.803
+                                      Gumbel top 10 (paper)    GB                0 0.821    0.816     0.825 0.795 0.811
+                                      Gumbel top 10 (paper)   XGB                0 0.817    0.813     0.822 0.796 0.812
+                             Two-sided Gumbel top 10 (ours)    LR                2 0.813    0.808     0.817 0.777 0.798
+                             Two-sided Gumbel top 10 (ours)    GB                2 0.821    0.816     0.825 0.802 0.816
+                             Two-sided Gumbel top 10 (ours)   XGB                2 0.817    0.812     0.821 0.796 0.812
+                                  Mutual information top 10    LR                1 0.814    0.810     0.819 0.777 0.799
+                                  Mutual information top 10    GB                1 0.822    0.817     0.826 0.789 0.808
+                                  Mutual information top 10   XGB                1 0.818    0.814     0.823 0.794 0.811
+                                         L1 logistic top 10    LR                2 0.816    0.812     0.821 0.788 0.806
+                                         L1 logistic top 10    GB                2 0.824    0.820     0.828 0.796 0.812
+                                         L1 logistic top 10   XGB                2 0.821    0.816     0.825 0.791 0.809
+Two-sided top 10, yes/no exercise -> exercise detail (ours)    LR                4 0.813    0.808     0.817 0.781 0.801
+Two-sided top 10, yes/no exercise -> exercise detail (ours)    GB                4 0.821    0.816     0.825 0.799 0.814
+Two-sided top 10, yes/no exercise -> exercise detail (ours)   XGB                4 0.817    0.812     0.821 0.804 0.817

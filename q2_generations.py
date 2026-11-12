@@ -6,20 +6,22 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tools
 
-d = tools.load_young()
-print(d.groupby("year").size().to_dict())
-
-d["GenZ"] = (d.year == 2023).astype(int)
-d["Obese"] = (d.weight_status == "Obese").astype(int)
-d["No_exercise"] = d.inactive
-d["Smoker"] = d.current_smoker
-d["Binge_drinking"] = d.binge
 habits = ["Obese", "No_exercise", "Smoker", "Binge_drinking"]
 
-# stratify on year and diabetes together
-grp = d.year.astype(str) + "_" + d.diabetes.astype(int).astype(str)
-train, valid, test = tools.split(d, grp)
-print("train", len(train), "valid", len(valid), "test", len(test))
+
+def add_columns(d):
+    d["GenZ"] = (d.year == 2023).astype(int)
+    d["Obese"] = (d.weight_status == "Obese").astype(int)
+    d["No_exercise"] = d.inactive
+    d["Smoker"] = d.current_smoker
+    d["Binge_drinking"] = d.binge
+    return d
+
+
+# split was stratified on year and diabetes together (see make_splits.py)
+train, valid = tools.load_train_valid("q2")
+train, valid = add_columns(train), add_columns(valid)
+print(train.groupby("year").size().to_dict(), "people per year in train")
 
 old, new = train[train.GenZ == 0], train[train.GenZ == 1]
 pct = pd.DataFrame({c: {"2015": tools.wpct(old[c], old.w), "2023": tools.wpct(new[c], new.w)}
@@ -46,6 +48,7 @@ print("\nvalidation:")
 print(pd.DataFrame(scores).round(4).to_string(index=False))
 print("picked:", best)
 
+test = add_columns(tools.load_test("q2"))
 scores.append(tools.score(fits[best], test, "diabetes", best, "test"))
 print(f"\ntest auc {scores[-1]['auc']:.3f}, log loss {scores[-1]['log_loss']:.4f}")
 

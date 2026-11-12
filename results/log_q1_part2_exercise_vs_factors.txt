@@ -1,4 +1,4 @@
-train 177576 valid 25368 test 50736
+q1: train 177576 rows, validation 25368 rows (test set not opened yet)
 
 % with diabetes (train):
 Obese              yes  23.6   no   9.5
@@ -14,6 +14,8 @@ validation:
           factors only valid    0.3981 0.6789
 factors + demographics valid    0.3581 0.7781
 picked: factors + demographics
+
+--- opening the q1 test set (50736 rows), used once ---
 
 test auc 0.782, log loss 0.3429
 

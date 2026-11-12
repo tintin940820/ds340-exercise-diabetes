@@ -4,19 +4,22 @@
 import pandas as pd
 import tools
 
-d = tools.load_adults()
-
-# 1 = has the risk
-d["Obese"] = (d.BMI >= 30).astype(int)
-d["Overweight"] = ((d.BMI >= 25) & (d.BMI < 30)).astype(int)
-d["No_exercise"] = 1 - d.PhysActivity
-d["Heavy_drinking"] = d.HvyAlcoholConsump
-d["Little_fruit"] = 1 - d.Fruits
-d["Little_vegetables"] = 1 - d.Veggies
 factors = ["Obese", "Overweight", "No_exercise", "Smoker", "Heavy_drinking", "Little_fruit", "Little_vegetables"]
 
-train, valid, test = tools.split(d, d.Diabetes)
-print("train", len(train), "valid", len(valid), "test", len(test))
+
+def add_factors(d):
+    # 1 = has the risk
+    d["Obese"] = (d.BMI >= 30).astype(int)
+    d["Overweight"] = ((d.BMI >= 25) & (d.BMI < 30)).astype(int)
+    d["No_exercise"] = 1 - d.PhysActivity
+    d["Heavy_drinking"] = d.HvyAlcoholConsump
+    d["Little_fruit"] = 1 - d.Fruits
+    d["Little_vegetables"] = 1 - d.Veggies
+    return d
+
+
+train, valid = tools.load_train_valid("q1")
+train, valid = add_factors(train), add_factors(valid)
 
 print("\n% with diabetes (train):")
 for f in factors:
@@ -33,6 +36,7 @@ print(pd.DataFrame(scores).round(4).to_string(index=False))
 print("picked:", best)
 
 m = fits[best]
+test = add_factors(tools.load_test("q1"))
 scores.append(tools.score(m, test, "Diabetes", best, "test"))
 print(f"\ntest auc {scores[-1]['auc']:.3f}, log loss {scores[-1]['log_loss']:.4f}")
 

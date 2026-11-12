@@ -1,6 +1,8 @@
 # reproduce parent paper 1 (Aich et al. 2025, arXiv 2505.22554), Table 3 on the CDC data
 # same 253,680 adults and 21 features, same 4 models, all features vs Gumbel copula top-10
-# paper setup: 80/20 stratified split, 20% of train held out to pick the threshold
+# paper setup: 80/20 stratified split, part of the 80% held out to pick the threshold.
+# we use the project split (make_splits.py): fit on train (70%), pick the threshold on
+# validation (10%), and score once on the unseen test set (20%, same size as the paper's test set).
 
 import pandas as pd
 import tools
@@ -19,11 +21,8 @@ PAPER_TOP10 = ["GenHlth", "HighBP", "DiffWalk", "HighChol", "BMI", "HeartDisease
                "Age", "PhysHlth", "Stroke", "CholCheck"]
 
 
-d = tools.load_adults()
-print(len(d), "adults,", round(100 * d.Diabetes.mean(), 1), "% with diabetes or prediabetes")
-
-train, valid, test = tools.split(d, d.Diabetes, test=0.20, valid=0.16)
-print("train", len(train), "valid", len(valid), "test", len(test))
+train, valid = tools.load_train_valid("q1")
+print(round(100 * train.Diabetes.mean(), 1), "% with diabetes or prediabetes in train")
 
 # copula feature screen on the training set
 g = gumbel_scores(train[tools.STD21], train.Diabetes)
@@ -35,17 +34,25 @@ print("paper top 10:", PAPER_TOP10)
 print("same features:", sorted(top10) == sorted(PAPER_TOP10))
 g.to_csv("results/parent_paper_1_gumbel_scores.csv", index=False)
 
-rows = []
+# fit every model on train and pick its threshold on validation
+y_tr = train.Diabetes.values
+picked = []
 for set_name, cols in [("All", tools.STD21), ("Gumbel", top10)]:
     for name in ["LR", "RF", "GB", "XGB"]:
-        y_tr = train.Diabetes.values
         m = fit(name, make_model(name, y_tr), train[cols], y_tr)
         t = best_threshold(m.predict_proba(valid[cols])[:, 1], valid.Diabetes.values)
-        r = evaluate(m.predict_proba(test[cols])[:, 1], test.Diabetes.values, t)
-        paper = dict(zip(["acc", "prec", "rec", "f1", "auc"], PAPER[(set_name, name)]))
-        rows.append({"features": set_name, "model": name, **r, **{f"paper_{k}": v for k, v in paper.items()}})
-        print(f"{set_name:6s} {name:3s}  ours auc {r['auc']:.3f} acc {r['acc']:.3f} f1 {r['f1']:.3f}"
-              f"   paper auc {paper['auc']:.3f} acc {paper['acc']:.3f} f1 {paper['f1']:.3f}", flush=True)
+        picked.append((set_name, name, cols, m, t))
+        print(f"fit {set_name:6s} {name:3s}  threshold {t:.3f}", flush=True)
+
+# everything is picked, now the test set is used once
+test = tools.load_test("q1")
+rows = []
+for set_name, name, cols, m, t in picked:
+    r = evaluate(m.predict_proba(test[cols])[:, 1], test.Diabetes.values, t)
+    paper = dict(zip(["acc", "prec", "rec", "f1", "auc"], PAPER[(set_name, name)]))
+    rows.append({"features": set_name, "model": name, **r, **{f"paper_{k}": v for k, v in paper.items()}})
+    print(f"{set_name:6s} {name:3s}  ours auc {r['auc']:.3f} acc {r['acc']:.3f} f1 {r['f1']:.3f}"
+          f"   paper auc {paper['auc']:.3f} acc {paper['acc']:.3f} f1 {paper['f1']:.3f}")
 
 out = pd.DataFrame(rows)
 out["auc_diff"] = out.auc - out.paper_auc

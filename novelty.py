@@ -3,7 +3,7 @@
 # so exercise, diet, income and education can never be picked.
 # we try 4 ways to pick the top 10 features, plus one that swaps the yes/no exercise answer
 # for the exercise detail we recovered from the raw file (minutes, MET of main sport, strength days, level),
-# and train the same models on each. same data, same split, same models as the reproduction.
+# and train the same models on each. same data, same split (data/splits), same models as the reproduction.
 
 import pandas as pd
 import matplotlib
@@ -12,16 +12,18 @@ import matplotlib.pyplot as plt
 import tools
 from tools import make_model, fit, best_threshold, evaluate, select_features
 
-d = tools.load_adults()
-# exercise detail: people with no exercise have no main sport, so their MET is 0
-d["MainSport_MET"] = d.MainSport_MET.where(d.PhysActivity == 1, 0)
+train, valid = tools.load_train_valid("q1")
 
-train, valid, test = tools.split(d, d.Diabetes, test=0.20, valid=0.16)
-for c in tools.EXERCISE:  # a few missing answers -> training median
-    med = train[c].median()
-    for part in (train, valid, test):
-        part[c] = part[c].fillna(med)
-print("train", len(train), "valid", len(valid), "test", len(test))
+
+def fix_met(d):
+    # exercise detail: people with no exercise have no main sport, so their MET is 0
+    d["MainSport_MET"] = d.MainSport_MET.where(d.PhysActivity == 1, 0)
+    return d
+
+
+train, valid = fix_met(train), fix_met(valid)
+medians = train[tools.EXERCISE].median()  # a few missing answers -> training median
+train, valid = train.fillna(medians), valid.fillna(medians)
 
 y_tr = train.Diabetes
 wide = tools.STD21 + tools.EXERCISE
@@ -48,16 +50,24 @@ print("\nfeatures picked:")
 for name, cols in sets.items():
     print(f"  {name}: {cols}")
 
-rows = []
+# fit every model on train and pick its threshold on validation
+picked = []
 for set_name, cols in sets.items():
     for name in ["LR", "GB", "XGB"]:
         m = fit(name, make_model(name, y_tr.values), train[cols], y_tr.values)
         t = best_threshold(m.predict_proba(valid[cols])[:, 1], valid.Diabetes.values)
-        r = evaluate(m.predict_proba(test[cols])[:, 1], test.Diabetes.values, t)
-        rows.append({"features": set_name, "model": name, "n_features": len(cols),
-                     "protective_kept": len(protective & set(cols)), **r})
-        print(f"{set_name:50s} {name:3s} auc {r['auc']:.3f} ({r['auc_low']:.3f}-{r['auc_high']:.3f})"
-              f" acc {r['acc']:.3f} f1 {r['f1']:.3f}", flush=True)
+        picked.append((set_name, name, cols, m, t))
+        print(f"fit {set_name:50s} {name:3s} threshold {t:.3f}", flush=True)
+
+# everything is picked, now the test set is used once
+test = fix_met(tools.load_test("q1")).fillna(medians)
+rows = []
+for set_name, name, cols, m, t in picked:
+    r = evaluate(m.predict_proba(test[cols])[:, 1], test.Diabetes.values, t)
+    rows.append({"features": set_name, "model": name, "n_features": len(cols),
+                 "protective_kept": len(protective & set(cols)), **r})
+    print(f"{set_name:50s} {name:3s} auc {r['auc']:.3f} ({r['auc_low']:.3f}-{r['auc_high']:.3f})"
+          f" acc {r['acc']:.3f} f1 {r['f1']:.3f}")
 
 out = pd.DataFrame(rows)
 out.to_csv("results/novelty_comparison.csv", index=False)

@@ -1,5 +1,5 @@
-{2015: 35367, 2023: 40371}
-train 53016 valid 7574 test 15148
+q2: train 53016 rows, validation 7574 rows (test set not opened yet)
+{2015: 24756, 2023: 28260} people per year in train
 
 % of young adults (train):
                 2015  2023  change
@@ -24,5 +24,7 @@ validation:
          + exercise valid    0.0895 0.6472
 + smoking, drinking valid    0.0896 0.6449
 picked: + obesity
+
+--- opening the q2 test set (15148 rows), used once ---
 
 test auc 0.692, log loss 0.0969

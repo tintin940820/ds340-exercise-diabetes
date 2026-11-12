@@ -1,49 +1,59 @@
-253680 adults, 15.8 % with diabetes or prediabetes
-train 162355 valid 40588 test 50737
+q1: train 177576 rows, validation 25368 rows (test set not opened yet)
+15.8 % with diabetes or prediabetes in train
 
 Gumbel copula scores (train):
              feature     tau  lambda_U
-             GenHlth  0.2708    0.3423
-              HighBP  0.2706    0.3421
-            DiffWalk  0.2228    0.2862
-            HighChol  0.2090    0.2697
-                 BMI  0.1930    0.2504
-HeartDiseaseorAttack  0.1771    0.2311
-                 Age  0.1595    0.2094
-            PhysHlth  0.1502    0.1978
-              Stroke  0.1015    0.1358
-           CholCheck  0.0692    0.0936
-              Smoker  0.0604    0.0820
-            MentHlth  0.0411    0.0562
-         NoDocbcCost  0.0357    0.0489
-                 Sex  0.0318    0.0436
-       AnyHealthcare  0.0156    0.0216
-           Education -0.1159    0.0000
-   HvyAlcoholConsump -0.0570    0.0000
-             Veggies -0.0578    0.0000
-              Fruits -0.0422    0.0000
-        PhysActivity -0.1210    0.0000
-              Income -0.1531    0.0000
+             GenHlth  0.2701    0.3415
+              HighBP  0.2696    0.3409
+            DiffWalk  0.2209    0.2839
+            HighChol  0.2089    0.2696
+                 BMI  0.1931    0.2506
+HeartDiseaseorAttack  0.1775    0.2315
+                 Age  0.1586    0.2083
+            PhysHlth  0.1493    0.1966
+              Stroke  0.1012    0.1355
+           CholCheck  0.0685    0.0927
+              Smoker  0.0610    0.0828
+            MentHlth  0.0412    0.0563
+         NoDocbcCost  0.0366    0.0501
+                 Sex  0.0310    0.0426
+       AnyHealthcare  0.0150    0.0207
+           Education -0.1157    0.0000
+   HvyAlcoholConsump -0.0569    0.0000
+             Veggies -0.0572    0.0000
+              Fruits -0.0424    0.0000
+        PhysActivity -0.1208    0.0000
+              Income -0.1524    0.0000
 
 our top 10:   ['GenHlth', 'HighBP', 'DiffWalk', 'HighChol', 'BMI', 'HeartDiseaseorAttack', 'Age', 'PhysHlth', 'Stroke', 'CholCheck']
 paper top 10: ['GenHlth', 'HighBP', 'DiffWalk', 'HighChol', 'BMI', 'HeartDiseaseorAttack', 'Age', 'PhysHlth', 'Stroke', 'CholCheck']
 same features: True
-All    LR   ours auc 0.818 acc 0.772 f1 0.795   paper auc 0.820 acc 0.791 f1 0.813
-All    RF   ours auc 0.807 acc 0.800 f1 0.812   paper auc 0.801 acc 0.779 f1 0.804
-All    GB   ours auc 0.825 acc 0.798 f1 0.814   paper auc 0.827 acc 0.804 f1 0.822
-All    XGB  ours auc 0.821 acc 0.792 f1 0.809   paper auc 0.827 acc 0.809 f1 0.826
-Gumbel LR   ours auc 0.814 acc 0.759 f1 0.786   paper auc 0.816 acc 0.797 f1 0.817
-Gumbel RF   ours auc 0.766 acc 0.761 f1 0.783   paper auc 0.741 acc 0.732 f1 0.766
-Gumbel GB   ours auc 0.821 acc 0.783 f1 0.803   paper auc 0.823 acc 0.813 f1 0.827
-Gumbel XGB  ours auc 0.817 acc 0.784 f1 0.804   paper auc 0.822 acc 0.810 f1 0.826
+fit All    LR   threshold 0.622
+fit All    RF   threshold 0.246
+fit All    GB   threshold 0.663
+fit All    XGB  threshold 0.261
+fit Gumbel LR   threshold 0.604
+fit Gumbel RF   threshold 0.237
+fit Gumbel GB   threshold 0.637
+fit Gumbel XGB  threshold 0.249
+
+--- opening the q1 test set (50736 rows), used once ---
+All    LR   ours auc 0.817 acc 0.792 f1 0.809   paper auc 0.820 acc 0.791 f1 0.813
+All    RF   ours auc 0.806 acc 0.787 f1 0.804   paper auc 0.801 acc 0.779 f1 0.804
+All    GB   ours auc 0.825 acc 0.810 f1 0.822   paper auc 0.827 acc 0.804 f1 0.822
+All    XGB  ours auc 0.822 acc 0.805 f1 0.819   paper auc 0.827 acc 0.809 f1 0.826
+Gumbel LR   ours auc 0.813 acc 0.784 f1 0.803   paper auc 0.816 acc 0.797 f1 0.817
+Gumbel RF   ours auc 0.760 acc 0.747 f1 0.773   paper auc 0.741 acc 0.732 f1 0.766
+Gumbel GB   ours auc 0.821 acc 0.795 f1 0.811   paper auc 0.823 acc 0.813 f1 0.827
+Gumbel XGB  ours auc 0.817 acc 0.796 f1 0.812   paper auc 0.822 acc 0.810 f1 0.826
 
 ours vs paper (test set):
 features model   auc  paper_auc  auc_diff   acc  paper_acc    f1  paper_f1
-     All    LR 0.818      0.820    -0.002 0.772      0.791 0.795     0.813
-     All    RF 0.807      0.801     0.006 0.800      0.779 0.812     0.804
-     All    GB 0.825      0.827    -0.002 0.798      0.804 0.814     0.822
-     All   XGB 0.821      0.827    -0.006 0.792      0.809 0.809     0.826
-  Gumbel    LR 0.814      0.816    -0.002 0.759      0.797 0.786     0.817
-  Gumbel    RF 0.766      0.741     0.025 0.761      0.732 0.783     0.766
-  Gumbel    GB 0.821      0.823    -0.002 0.783      0.813 0.803     0.827
-  Gumbel   XGB 0.817      0.822    -0.005 0.784      0.810 0.804     0.826
+     All    LR 0.817      0.820    -0.003 0.792      0.791 0.809     0.813
+     All    RF 0.806      0.801     0.005 0.787      0.779 0.804     0.804
+     All    GB 0.825      0.827    -0.002 0.810      0.804 0.822     0.822
+     All   XGB 0.822      0.827    -0.005 0.805      0.809 0.819     0.826
+  Gumbel    LR 0.813      0.816    -0.003 0.784      0.797 0.803     0.817
+  Gumbel    RF 0.760      0.741     0.019 0.747      0.732 0.773     0.766
+  Gumbel    GB 0.821      0.823    -0.002 0.795      0.813 0.811     0.827
+  Gumbel   XGB 0.817      0.822    -0.005 0.796      0.810 0.812     0.826
