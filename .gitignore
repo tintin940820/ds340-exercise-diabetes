@@ -5,3 +5,4 @@ __pycache__/
 data/*
 !data/analysis_core.csv.gz
 !data/generation_core.csv.gz
+!data/splits/

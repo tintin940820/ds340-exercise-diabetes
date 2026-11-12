@@ -14,6 +14,18 @@ data/analysis_core.csv.gz - 2015, all adults, 253,680 rows (Q1)
 data/generation_core.csv.gz - 2015, 2021, 2023, ages 18-29, 139,113 rows (Q2)
 Outcome = 1 if ever told they have diabetes or prediabetes.
 
+Train, validation and test sets (data/splits/, made by make_splits.py)
+Split 70% train / 10% validation / 20% test, stratified, seed 42. Each file has a
+"dataset" column that says train, validation or test.
+data/splits/q1_train.csv.gz       177,576 rows (70%)
+data/splits/q1_validation.csv.gz   25,368 rows (10%)
+data/splits/q1_test.csv.gz         50,736 rows (20%)
+data/splits/q2_train.csv.gz        53,016 rows (70%)
+data/splits/q2_validation.csv.gz    7,574 rows (10%)
+data/splits/q2_test.csv.gz         15,148 rows (20%)
+Train is used to fit the models, validation to pick the model and threshold.
+Test is the unseen set: it is not touched until the code is bug free, and then used once.
+
 The raw CDC files are too big for GitHub. Download them here:
 https://www.cdc.gov/brfss/annual_data/annual_2015.html
 https://www.cdc.gov/brfss/annual_data/annual_2021.html
@@ -21,6 +33,7 @@ https://www.cdc.gov/brfss/annual_data/annual_2023.html
 
 Files
 prepare/ - makes the two clean tables from the raw files
+make_splits.py - saves the train, validation and test sets to data/splits/
 tools.py - shared functions (load data, split, fit model, score, odds ratios, charts)
 parent_paper_1.py - reproduces parent paper 1 (Aich et al. 2025) Table 3
 novelty.py - our change to parent paper 1 (new feature selection block), compared with other methods
