@@ -50,6 +50,8 @@ https://www.cdc.gov/brfss/annual_data/annual_2023.html
 Files
 prepare/ - makes the two clean tables from the raw files
 make_splits.py - step 1: makes and checks the train, validation and test sets (data/splits/)
+run_all.py - runs every step in order
+check_results.py - last step: compares the new results with the numbers in our paper
 tools.py - shared functions (load data, split, fit model, score, odds ratios, charts)
 parent_paper_1.py - reproduces parent paper 1 (Aich et al. 2025) Table 3
 novelty.py - our change to parent paper 1 (new feature selection block), compared with other methods
@@ -109,11 +111,18 @@ Q1 and Q2: weighted logistic regression with the CDC survey weights.
 Odds ratios come from the training set. The model is picked on validation (lowest log loss)
 and checked once on test.
 
-Run (Python 3.10 or newer, from this folder)
-pip install -r requirements.txt
-bash run_all.sh            (runs everything in order, about 30 minutes)
-Or one at a time: python3 make_splits.py first, then any of the analysis scripts.
-Each script writes its output to results/log_<script>.txt, results/ and figures/.
+Run (Python 3.10 or newer)
+1. Download the code: on GitHub click Code > Download ZIP and unzip it
+   (or: git clone https://github.com/tintin940820/ds340-exercise-diabetes.git)
+2. Open a terminal in the unzipped folder (Windows: Command Prompt or Anaconda Prompt)
+3. pip install -r requirements.txt
+4. python run_all.py       (Mac/Linux: python3 run_all.py; or bash run_all.sh)
+run_all.py runs every script in order (about 20 minutes, a slower computer may take 30) and saves each printout to
+results/log_<script>.txt. Tables go to results/ and charts to figures/.
+The last step, check_results.py, prints each new number next to the number in our paper
+(Tables III and IV and Section IV.D) and says "every number above matches the paper".
+Or one at a time: python make_splits.py first, then any of the analysis scripts,
+then python check_results.py.
 
 To rebuild the clean tables (inside prepare/):
 python3 01_load_raw.py LLCP2015.XPT
