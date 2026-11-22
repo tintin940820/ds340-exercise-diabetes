@@ -37,16 +37,32 @@ check("RQ1b factors + demographics, test",
 check("RQ2 age, sex + obesity, validation", auc("q2_model_check.csv", "+ obesity", "valid"), 0.645)
 check("RQ2 age, sex + obesity, test", auc("q2_model_check.csv", "+ obesity", "test"), 0.692)
 
+print("\nTable II: test AUC of each feature set (and protective features kept)")
+nov = pd.read_csv("results/novelty_comparison.csv")
+table2 = {"All 21 (paper)": ("All 21", 6, 0.817, 0.825, 0.822),
+          "Gumbel top 10 (paper)": ("Gumbel top 10", 0, 0.813, 0.821, 0.817),
+          "Two-sided Gumbel top 10 (ours)": ("Two-sided top 10", 2, 0.813, 0.821, 0.817),
+          "Mutual information top 10": ("Mutual information", 1, 0.814, 0.822, 0.818),
+          "L1 logistic top 10": ("L1 logistic", 2, 0.816, 0.824, 0.821),
+          "Two-sided top 10, yes/no exercise -> exercise detail (ours)":
+              ("Two-sided + exercise detail", 4, 0.813, 0.821, 0.817)}
+for features, (label, kept, *aucs) in table2.items():
+    rows = nov[nov.features == features]
+    check(f"{label}, protective kept", int(rows.protective_kept.iloc[0]), kept)
+    for model, paper in zip(["LR", "GB", "XGB"], aucs):
+        check(f"{label}, {model}", rows[rows.model == model].auc.iloc[0], paper)
+
+print("\nSection III.E: F1 of the paper's top 10 and ours")
+for features, label, f1s in [("Gumbel top 10 (paper)", "Gumbel top 10", (0.803, 0.811, 0.812)),
+                             ("Two-sided Gumbel top 10 (ours)", "Two-sided top 10", (0.798, 0.816, 0.812))]:
+    rows = nov[nov.features == features]
+    for model, paper in zip(["LR", "GB", "XGB"], f1s):
+        check(f"{label} F1, {model}", rows[rows.model == model].f1.iloc[0], paper)
+
 print("\nSection IV.D: parent paper 1 on the same sets (test AUC)")
 rep = pd.read_csv("results/parent_paper_1_reproduction.csv")
 for model, paper in [("LR", 0.817), ("RF", 0.806), ("GB", 0.825), ("XGB", 0.822)]:
     check(f"all 21 features, {model}", rep[(rep.features == "All") & (rep.model == model)].auc.iloc[0], paper)
-nov = pd.read_csv("results/novelty_comparison.csv")
-for model, paper in [("LR", 0.813), ("GB", 0.821), ("XGB", 0.817)]:
-    check(f"two-sided Gumbel top 10 (ours), {model}",
-          nov[(nov.features == "Two-sided Gumbel top 10 (ours)") & (nov.model == model)].auc.iloc[0], paper)
-check("protective features kept by mutual information",
-      int(nov[nov.features == "Mutual information top 10"].protective_kept.iloc[0]), 1)
 
 # the paper's top 10 (Aich et al.), in order
 paper_top10 = ["GenHlth", "HighBP", "DiffWalk", "HighChol", "BMI",
