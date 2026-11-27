@@ -54,4 +54,5 @@ print(out.round(2).to_string())
 
 out.to_csv("results/q1_part1_which_exercise.csv")
 pd.DataFrame(scores).to_csv("results/q1_part1_model_check.csv", index=False)
-tools.barh(out.odds_ratio, "figures/q1_part1_which_exercise.png", "Odds ratio vs no exercise", size=(6.5, 6.5))
+tools.barh(out.odds_ratio, "figures/q1_part1_which_exercise.png", "Odds ratio vs no exercise (95% interval)",
+           size=(6.5, 6.5), low=out.low_95, high=out.high_95)

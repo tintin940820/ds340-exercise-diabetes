@@ -10,7 +10,7 @@ import sys
 import time
 
 STEPS = ["make_splits", "q1_part1_which_exercise", "q1_part2_exercise_vs_factors",
-         "q2_generations", "parent_paper_1", "novelty", "check_results"]
+         "q1_checks", "q2_generations", "parent_paper_1", "novelty", "check_results"]
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 os.makedirs("results", exist_ok=True)

@@ -203,10 +203,15 @@ def select_features(method, X, y, k=10):
 
 # ---- output
 
-def barh(values, path, xlabel, highlight=None, ref=1, size=(6.5, 3.5)):
+def barh(values, path, xlabel, highlight=None, ref=1, size=(6.5, 3.5), low=None, high=None):
+    # one bar per row, a line at ref (1 = no difference), and the 95% interval if low/high are given
     fig, ax = plt.subplots(figsize=size)
     colors = ["#c4622d" if i == highlight else "#1f63a8" for i in values.index[::-1]]
-    ax.barh(values.index[::-1], values[::-1], color=colors)
+    labels = [str(i).replace("_", " ") for i in values.index[::-1]]
+    err = None
+    if low is not None:
+        err = [(values - low)[::-1], (high - values)[::-1]]
+    ax.barh(labels, values[::-1], color=colors, xerr=err, ecolor="#555555", capsize=2)
     ax.axvline(ref, color="#222222")
     ax.set_xlabel(xlabel)
     fig.savefig(path, dpi=200, bbox_inches="tight")

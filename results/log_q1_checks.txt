@@ -1,0 +1,21 @@
+q1: train 177576 rows, validation 25368 rows (test set not opened yet)
+
+check 1: 148063 people -> 109633 after removing fair/poor health or trouble walking
+odds ratio vs no exercise:
+                 all  healthier only  low_95  high_95  change
+Tennis          0.28            0.39    0.26     0.59    0.11
+Golf (walking)  0.30            0.40    0.29     0.55    0.11
+Running         0.31            0.37    0.32     0.42    0.06
+Yoga            0.31            0.46    0.33     0.62    0.14
+Basketball      0.31            0.48    0.33     0.70    0.17
+Weight lifting  0.33            0.36    0.31     0.43    0.04
+Bicycling       0.50            0.57    0.49     0.66    0.07
+Gardening       0.52            0.62    0.55     0.69    0.09
+Aerobics        0.60            0.65    0.55     0.78    0.06
+Walking         0.80            0.92    0.87     0.97    0.12
+
+check 2: odds ratio vs 0 minutes per week:
+             odds_ratio  low_95  high_95  n_train
+1-149 min          0.82    0.79     0.85    33511
+150-299 min        0.78    0.74     0.81    31340
+300+ min           0.61    0.59     0.64    65559

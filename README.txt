@@ -37,6 +37,7 @@ How each script uses the three sets
   script                              train                validation               test
   q1_part1_which_exercise.py          fit 2 models         pick the better one      final AUC
   q1_part2_exercise_vs_factors.py     fit 2 models         pick the better one      final AUC
+  q1_checks.py                        2 checks on Q1       -                        -
   q2_generations.py                   fit 4 models         pick the best one        final AUC
   parent_paper_1.py                   fit 8 models         pick each cutoff         compare with paper
   novelty.py                          fit 18 models,       pick each cutoff         compare feature sets
@@ -55,9 +56,11 @@ check_results.py - last step: compares the new results with the numbers in our p
 tools.py - shared functions (load data, split, fit model, score, odds ratios, charts)
 parent_paper_1.py - reproduces parent paper 1 (Aich et al. 2025) Table 3
 novelty.py - our change to parent paper 1 (new feature selection block), compared with other methods
-q1_part1_which_exercise.py
-q1_part2_exercise_vs_factors.py
-q2_generations.py
+q1_part1_which_exercise.py - Q1 part 1: odds of diabetes for each main sport vs no exercise
+q1_part2_exercise_vs_factors.py - Q1 part 2: no exercise next to weight, smoking, drinking and diet
+q1_checks.py - two checks on Q1 part 1 (from midterm feedback): without people in fair/poor
+  health or with trouble walking, and minutes of activity per week instead of the main sport
+q2_generations.py - Q2: Gen Z (2023) vs Millennials (2015) at ages 18-29
 results/ - output tables
 figures/ - charts
 
@@ -105,6 +108,20 @@ Two-sided Gumbel keeps Income and PhysActivity in place of Stroke and CholCheck.
 AUC is the same as the paper's top 10 for all 3 models, and F1 is about the same.
 So we keep the same accuracy while keeping exercise and income in the model.
 L1 logistic gives the best AUC with 10 features.
+
+Main results (odds ratios from the training set, 95% interval)
+Q1 part 1, vs no exercise: tennis 0.28, walking golf 0.30, running 0.31, basketball 0.31,
+  yoga 0.31, weight lifting 0.33 ... walking 0.81, exercise bike 0.92 (0.82-1.02).
+  results/q1_part1_which_exercise.csv, figures/q1_part1_which_exercise.png
+Q1 part 2, all in one model: obese 4.42, overweight 2.02, no exercise 1.28, smoker 1.11,
+  little vegetables 1.09, little fruit 1.08, heavy drinking 0.56.
+  results/q1_part2_exercise_vs_factors.csv, figures/q1_part2_exercise_vs_factors.png
+Q1 checks: without people in fair/poor health or with trouble walking, running 0.37,
+  weight lifting 0.36, walking 0.92. By minutes per week vs 0: 1-149 min 0.82,
+  150-299 min 0.78, 300+ min 0.61. results/q1_check_*.csv, figures/q1_check_healthier_only.png
+Q2: diabetes or prediabetes 1.5% (2015) vs 2.8% (2023) at ages 18-29. Gen Z odds ratio
+  1.83 (age, sex), 1.71 (+ obesity), 1.72 (+ exercise), 1.85 (+ smoking, drinking).
+  results/q2_*.csv, figures/q2_generations.png
 
 Method
 Q1 and Q2: weighted logistic regression with the CDC survey weights.
