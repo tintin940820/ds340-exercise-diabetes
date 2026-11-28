@@ -59,6 +59,38 @@ for features, label, f1s in [("Gumbel top 10 (paper)", "Gumbel top 10", (0.803, 
     for model, paper in zip(["LR", "GB", "XGB"], f1s):
         check(f"{label} F1, {model}", rows[rows.model == model].f1.iloc[0], paper)
 
+print("\nFig. 1 and Section VI.A: odds ratio vs no exercise")
+sports = pd.read_csv("results/q1_part1_which_exercise.csv", index_col=0)
+for sport, paper in [("Tennis", 0.28), ("Golf (walking)", 0.30), ("Running", 0.31), ("Basketball", 0.31),
+                     ("Yoga", 0.31), ("Weight lifting", 0.33), ("Jogging", 0.59), ("Walking", 0.81),
+                     ("Exercise bike", 0.92)]:
+    check(f"{sport}", round(sports.odds_ratio[sport], 2), paper)
+check("sports with interval below 1", int((sports.high_95 < 1).sum()), 22)
+
+print("\nTable V: odds ratio of each risk factor")
+factors = pd.read_csv("results/q1_part2_exercise_vs_factors.csv", index_col=0)
+for f, paper in [("Obese", 4.42), ("Overweight", 2.02), ("No_exercise", 1.28), ("Smoker", 1.11),
+                 ("Little_vegetables", 1.09), ("Little_fruit", 1.08), ("Heavy_drinking", 0.56)]:
+    check(f, round(factors.odds_ratio[f], 2), paper)
+
+print("\nFig. 2 and Table VI: the two checks")
+healthy = pd.read_csv("results/q1_check_healthier_only.csv", index_col=0)
+for sport, paper in [("Running", 0.37), ("Weight lifting", 0.36), ("Walking", 0.92), ("Yoga", 0.46),
+                     ("Basketball", 0.48)]:
+    check(f"{sport}, healthier only", round(healthy["healthier only"][sport], 2), paper)
+minutes = pd.read_csv("results/q1_check_minutes_per_week.csv", index_col=0)
+for m, paper in [("1-149 min", 0.82), ("150-299 min", 0.78), ("300+ min", 0.61)]:
+    check(m, round(minutes.odds_ratio[m], 2), paper)
+
+print("\nTable VII and Fig. 3: Gen Z")
+genz = pd.read_csv("results/q2_genz_odds_ratio.csv", index_col=0)
+for m, paper in [("age, sex", 1.83), ("+ obesity", 1.71), ("+ exercise", 1.72), ("+ smoking, drinking", 1.85)]:
+    check(f"Gen Z odds ratio, {m}", round(genz.genz_odds_ratio[m], 2), paper)
+habits = pd.read_csv("results/q2_habits_and_diabetes.csv", index_col=0)
+for h, p15, p23 in [("diabetes", 1.5, 2.8), ("Obese", 19.7, 23.4), ("Smoker", 17.4, 6.8)]:
+    check(f"% {h}, 2015", round(habits["2015"][h], 1), p15)
+    check(f"% {h}, 2023", round(habits["2023"][h], 1), p23)
+
 print("\nSection IV.D: parent paper 1 on the same sets (test AUC)")
 rep = pd.read_csv("results/parent_paper_1_reproduction.csv")
 for model, paper in [("LR", 0.817), ("RF", 0.806), ("GB", 0.825), ("XGB", 0.822)]:
